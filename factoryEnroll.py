@@ -5,9 +5,9 @@ from pathlib import Path
 import tarfile
 
 # External Configuration
-_picProxy1 = '192.168.8.4'                          # Define first PIC Proxy IP
-_picProxy2 = '192.168.8.5'                          # Define second PIC Proxy IP
-_picProxyPort = '8000'                              # Define PIC Proxy Port
+_picProxy1 = '192.168.8.1'                          # Define first PIC Proxy IP
+_picProxy2 = '192.168.8.2'                          # Define second PIC Proxy IP
+_picProxyPort = '9880'                              # Define PIC Proxy Port
 
 # Internal Global Variable
 _outputFolder = Path('device')                      # Content working folder
@@ -26,13 +26,13 @@ def validInputParameters():
     serialNumber=None
     short_options = "m:M:s:"
     long_options = ["macAddress=", "modelName=", "serialNumber="]
-    returnCode = 999
+    returnCode = 199
 
     try:
         argument_list = sys.argv[1:]
         arguments, values = getopt.getopt(argument_list, short_options, long_options)
     except getopt.error as err:
-        returnCode = 301        # Unknow error on Get Opt
+        returnCode = 131        # Unknow error on Get Opt
         sys.exit(returnCode)
 
     for current_argument, current_value in arguments:
@@ -44,7 +44,7 @@ def validInputParameters():
             serialNumber = current_value            
 
     if (macAddress == None) or (modelName == None) or (serialNumber == None):
-        returnCode = 302        # Using: factoryEnroll.py -m {mac address} -M {model name} -s {serial number}
+        returnCode = 132        # Using: factoryEnroll.py -m {mac address} -M {model name} -s {serial number}
         sys.exit(returnCode)
     
     return macAddress, modelName, serialNumber
@@ -58,7 +58,7 @@ def validInputParameters():
 def requestCAfromDLMProxy(MAC, modelName, serialNo, proxyId):
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}        
         data = {'mac': MAC.replace(':',''), 'serialNumber': serialNo, 'modelName':modelName}
-        returnCode = 999
+        returnCode = 199
 
         if proxyId == 1:
             picProxy = _picProxy1
@@ -75,7 +75,7 @@ def requestCAfromDLMProxy(MAC, modelName, serialNo, proxyId):
                     returnCode = int(result['error']['code'])       # Error from PIC Server
                     sys.exit(returnCode)
                 else:
-                    sys.exit(returnCode)        # Unknow Error from PIC Server, 500
+                    sys.exit(returnCode)        # Unknow Error from PIC Server, 199
         except Exception as error:            
             return None, None
 
@@ -87,7 +87,7 @@ def requestCAfromDLMProxy(MAC, modelName, serialNo, proxyId):
 #   - output device.tar.gz to stdout
 # 
 def outputCertificate(Cert, PK):  
-    returnCode = 999
+    returnCode = 199
 
     try:                        # Save PK and Cert Files
         if not _outputFolder.exists():
@@ -96,7 +96,7 @@ def outputCertificate(Cert, PK):
         _keyFileName.write_text(PK)
         _certFileName.write_text(Cert)
     except Exception as error:
-        returnCode = 600        # Can't write data to file
+        returnCode = 160        # Can't write data to file
         sys.exit(returnCode)
 
     try:                        # Create tar File
@@ -105,14 +105,14 @@ def outputCertificate(Cert, PK):
             tar.add(file_name, os.path.basename(file_name))
         tar.close()
     except Exception as error:
-        returnCode = 601        # Can't crate tar file
+        returnCode = 161        # Can't crate tar file
         sys.exit(returnCode)
 
     try:                        # Output tar content to stdout        
         #print(_outputFile.read_bytes(), file = sys.stdout)     
         sys.stdout.buffer.write(_outputFile.read_bytes())   
     except Exception as error:
-        returnCode = 602        # Can't read tar file
+        returnCode = 162        # Can't read tar file
         sys.exit(returnCode)
 
 #
@@ -150,7 +150,7 @@ if (cert == None):
         counter = counter + 1
     
     if (cert == None):
-        returnCode = 404                # Can't Reach PIC Proxy Server
+        returnCode = 104                # Can't Reach PIC Proxy Server
         sys.exit(returnCode)            # Exit
     
 
