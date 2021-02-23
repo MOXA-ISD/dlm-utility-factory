@@ -109,7 +109,8 @@ def outputCertificate(Cert, PK):
         sys.exit(returnCode)
 
     try:                        # Output tar content to stdout        
-        print(_outputFile.read_bytes(), file = sys.stdout)        
+        #print(_outputFile.read_bytes(), file = sys.stdout)     
+        sys.stdout.buffer.write(_outputFile.read_bytes())   
     except Exception as error:
         returnCode = 602        # Can't read tar file
         sys.exit(returnCode)
